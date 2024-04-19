@@ -32,8 +32,6 @@ Route::post("login",[UserController::class,"login"]);
 //Password reset api
 Route::post('password/email', [PasswordResetController::class, 'sendResetCode']);
 Route::post('password/reset', [PasswordResetController::class, 'resetPasswordWithCode']);
-
-
 Route::group(["middleware"=>["auth:api"]],function () {
     //User api
     Route::get( "myProfile", [ UserController::class, "myProfile" ] );
