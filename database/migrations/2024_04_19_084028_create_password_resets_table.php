@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('email');
             $table->string('code');
             $table->timestamp('created_at')->nullable();
-            $table->timestamp('expires_at');
+            $table->timestamp('expires_at')->default(now()); // Set a default value for expires_at column;
         });
     }
 

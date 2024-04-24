@@ -11,25 +11,60 @@ use Illuminate\Support\Facades\Validator;
 use App\Http\Traits\GeneralTrait;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\QueryException;
+use Symfony\Component\Mailer\Exception\TransportException;
+
 class UserController extends Controller
 {
     use GeneralTrait;
+
+    /*
     public function sendVerificationCode(Request $request)
     {
         try {
             $this->validate($request, [
                 'email' => 'required|email|unique:users,email'
             ]);
+
             $code = random_int(100000, 999999);
+
+            // Store the email and verification code in the session
             $request->session()->put('email', $request->input('email'));
             $request->session()->put('verification_code', $code);
-                Mail::to($request->input('email'))->send(new AccountConfirmationMail);
+
+            Mail::to($request->input('email'))->send(new AccountConfirmationMail);
             return $this->returnSuccessMessage('A verification code has been sent to your email.',200);
         } catch (ValidationException $e) {
             return $this->returnError($e->validator->errors()->first(),400);
         }
     }
-    
+
+    */
+    public function sendVerificationCode(Request $request)
+    {
+        try {
+            $this->validate($request, [
+                'email' => 'required|email|unique:users,email'
+            ]);
+
+            $code = random_int(100000, 999999);
+
+            // Store the email and verification code in the session
+            $request->session()->put('email', $request->input('email'));
+            $request->session()->put('verification_code', $code);
+
+            // Retry sending email up to 3 times with a delay between retries
+            retry(3, function () use ($request) {
+                Mail::to($request->input('email'))->send(new AccountConfirmationMail);
+            }, 1000); // 1000 milliseconds delay between retries
+
+            return $this->returnSuccessMessage('A verification code has been sent to your email.', 200);
+        } catch (ValidationException $e) {
+            return $this->returnError($e->validator->errors()->first(), 400);
+        } catch (TransportException $exception) {
+            // If unable to establish connection after retries, return an error
+            return $this->returnError('Failed to send verification code. Please try again later.', 500);
+        }
+    }
 
     public function verifyCode(Request $request)
     {
@@ -64,14 +99,14 @@ class UserController extends Controller
             'address'     => 'required',
             'personal_id' => 'required'
         ]);
-    
+
         if ($validateUser->fails()) {
             return $this->returnError($validateUser->errors(), 'Validation Error');
         }
-    
+
         // Retrieve the email from the session
         $email = $request->session()->get('email');
-    
+
         // Create a new user record in the database
         $user = new User();
         $user->first_name = $request->input('first_name');
@@ -81,7 +116,7 @@ class UserController extends Controller
         $user->password = bcrypt($request->input('password'));
         $user->phone = $request->input('phone');
         $user->personal_id = $request->input('personal_id');
-    
+
         // Upload user photo if provided
         if ($request->hasFile('photo')) {
             $photo = $request->file('photo');
@@ -90,13 +125,13 @@ class UserController extends Controller
             $photoPath = 'uploads/users_photo/' . $photoExtension;
             $user->photo = $photoPath;
         }
-    
+
         $user->save();
         $token = $user->createToken("auth_token")->accessToken;
-    
+
         // Clear the session data
         $request->session()->forget('email');
-    
+
         return $this->returnData('User Registered Successfully.', $token, 200);
     } catch (QueryException $e) {
         return $this->returnError($e->getMessage(), 'Database Error');
@@ -152,7 +187,7 @@ class UserController extends Controller
     public function updateProfile(Request $request)
     {
         $user = auth()->user();
-    
+
         // Validate the input
         $validatedData = $request->validate([
             'first_name' => 'required|string|max:255',
@@ -163,13 +198,13 @@ class UserController extends Controller
             'current_password' => 'required_with:new_password',
             'new_password' => 'nullable|string|min:6|confirmed',
         ]);
-    
+
         // Update the user's profile information
         $user->first_name = $validatedData['first_name'];
         $user->last_name = $validatedData['last_name'];
         $user->phone = $validatedData['phone'] ?? $user->phone;
         $user->address = $validatedData['address'] ?? $user->address;
-    
+
         $photo = $request->file('photo');
         if ($request->hasFile('photo')) {
             $photoExtension = time() . '.' . $photo->getClientOriginalExtension();
@@ -177,12 +212,12 @@ class UserController extends Controller
             $photoPath = 'uploads/users_photo/' . $photoExtension;
             $user->photo = $photoPath;
         }
-    
+
         // Update the user's password if a new password has been provided
         if (isset($validatedData['new_password'])) {
             $currentPassword = $validatedData['current_password'];
             $newPassword = $validatedData['new_password'];
-    
+
             // Check if the current password is correct
             if (Hash::check($currentPassword, $user->password)) {
                 // Hash and save the new password
@@ -192,10 +227,10 @@ class UserController extends Controller
                 return $this->returnError('The current password is incorrect.', 'Password Update Failed', 400);
             }
         }
-    
+
         // Save the updated profile information and password
         $user->save();
-    
+
         // Return a success response
         return $this->returnSuccessMessage('Your profile has been updated.', 200);
     }
@@ -204,14 +239,14 @@ class UserController extends Controller
     {
         $inputPassword = $request->input('password');
         $hashedPassword = auth()->user()->password;
-    
+
         $validator = Validator::make(
             ['password' => $inputPassword],
             ['password' => 'required']
         );
-    
-    
-    
+
+
+
         if (Hash::check($inputPassword, $hashedPassword)) {
             return $this->returnSuccessMessage('Valid password', 200);
         } else {
