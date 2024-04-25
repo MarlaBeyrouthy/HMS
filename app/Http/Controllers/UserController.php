@@ -160,7 +160,7 @@ class UserController extends Controller
 
     public function myProfile()
     {
-        $user_data = auth()->user()->makeHidden(['verification_code', 'verified']);
+        $user_data = auth()->user();
         return $this->returnData('user data.', $user_data, 200);
     }
     public function getProfile($user_id)

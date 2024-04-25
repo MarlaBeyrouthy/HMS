@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\PasswordResetController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\WishListController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -39,4 +41,14 @@ Route::group(["middleware"=>["auth:api"]],function () {
     Route::post( "user/profile", [ UserController::class, "updateProfile" ] );
     Route::get( "logout", [ UserController::class, "logout" ] );
     Route::post( "checkPassword", [ UserController::class, "checkPassword" ] );
+
+    //wishlist api
+    Route::get('wishlists/add', [WishlistController::class,'addToWishlist']);
+    Route::delete('wishlist/{roomId}', [WishlistController::class,'removeFromWishlist']);
+    Route::get('wishlist', [WishlistController::class,'getWishlist']);
+    Route::get('wishlist/ID', [WishlistController::class,'getIDs']);
 });
+
+//reports api
+Route::post('/reports', [ReportController::class, 'create_report']);
+Route::get('/reports', [ReportController::class, 'my_reports']);

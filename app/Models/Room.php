@@ -25,10 +25,11 @@ class Room extends Model
     {
         return $this->hasMany(Booking::class);
     }
-    public function wishlists()
+    public function wishlistedBy()
     {
-        return $this->hasMany(Wishlist::class);
+        return $this->belongsToMany(User::class, 'wishlists');
     }
+
     public function reviews()
     {
         return $this->hasMany(Review::class);
