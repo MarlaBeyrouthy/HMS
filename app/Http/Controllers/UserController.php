@@ -190,8 +190,8 @@ class UserController extends Controller
 
         // Validate the input
         $validatedData = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
+            'first_name' => 'nullable|string|max:255',
+            'last_name' => 'nullable|string|max:255',
             'address' => 'nullable|string|max:500',
             'phone' => 'nullable',
             'photo' => 'nullable|image|max:2048',
@@ -200,11 +200,12 @@ class UserController extends Controller
         ]);
 
         // Update the user's profile information
-        $user->first_name = $validatedData['first_name'];
-        $user->last_name = $validatedData['last_name'];
+        $user->first_name = $validatedData['first_name'] ?? $user->first_name;
+        $user->last_name = $validatedData['last_name'] ?? $user->last_name;
         $user->phone = $validatedData['phone'] ?? $user->phone;
         $user->address = $validatedData['address'] ?? $user->address;
 
+        /*
         $photo = $request->file('photo');
         if ($request->hasFile('photo')) {
             $photoExtension = time() . '.' . $photo->getClientOriginalExtension();
@@ -212,6 +213,30 @@ class UserController extends Controller
             $photoPath = 'uploads/users_photo/' . $photoExtension;
             $user->photo = $photoPath;
         }
+*/
+        // Update the user's profile photo
+        $photo = $request->file('photo');
+        if ($request->hasFile('photo')) {
+            // Delete the old photo file if it exists
+            if ($user->photo && file_exists(public_path($user->photo))) {
+                unlink(public_path($user->photo));
+            }
+
+            // Upload the new photo
+            $photoExtension = time() . '.' . $photo->getClientOriginalExtension();
+            $photo->move(public_path('uploads/users_photo'), $photoExtension);
+            $photoPath = 'uploads/users_photo/' . $photoExtension;
+            $user->photo = $photoPath;
+        } elseif ($request->has('delete_photo')) {
+            // Delete the current photo file if it exists
+            if ($user->photo && file_exists(public_path($user->photo))) {
+                unlink(public_path($user->photo));
+            }
+
+            // Remove the photo path from the user's record
+            $user->photo = null;
+        }
+
 
         // Update the user's password if a new password has been provided
         if (isset($validatedData['new_password'])) {

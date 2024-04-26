@@ -34,5 +34,12 @@ class Room extends Model
     {
         return $this->hasMany(Review::class);
     }
+
+    public function calculateAverageRating()
+    {
+        $averageRating = $this->reviews()->avg('rating');
+        $this->update(['average_rating' => $averageRating]);
+        return $averageRating;
+    }
 }
 
