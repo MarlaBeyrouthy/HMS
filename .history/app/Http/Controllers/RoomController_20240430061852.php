@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
-use App\Models\Room;
 use Illuminate\Http\Request;
+use App\Models\Room;
 use App\Http\Traits\GeneralTrait; // استخدام ميزة عامة
 
 class RoomController extends Controller

@@ -133,7 +133,7 @@ public function handlePaymentSuccess(Request $request)
         'invoice' => $invoice
     ]);
 }
-//تابع لاكمال عملية الدفع 
+//j
 public function completePayment(Request $request)
 {
     // البحث عن الحجز المطلوب بناءً على معرف الحجز
@@ -168,6 +168,7 @@ public function completePayment(Request $request)
                 'invoice_date' => now(),
             ]);
         }
+        // جلب اسم المستخدم ورقم الغرفة وإرجاعها
         $username = $booking->user->first_name;
         $roomNumber = $booking->room->room_number;
         return $this->returnData('Payment completed successfully.', 

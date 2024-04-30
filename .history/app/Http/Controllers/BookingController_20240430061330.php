@@ -168,7 +168,7 @@ public function completePayment(Request $request)
                 'invoice_date' => now(),
             ]);
         }
-        $username = $booking->user->first_name;
+=        $username = $booking->user->first_name;
         $roomNumber = $booking->room->room_number;
         return $this->returnData('Payment completed successfully.', 
         [

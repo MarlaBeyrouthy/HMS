@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
-use App\Models\Room;
 use Illuminate\Http\Request;
+use App\Models\Room;
 use App\Http\Traits\GeneralTrait; // استخدام ميزة عامة
 
 class RoomController extends Controller
@@ -85,7 +84,6 @@ class RoomController extends Controller
 
         // تحضير قائمة للأوقات المتاحة
         $availableTimes = [];
-        //تحويل تواريخ الحجز من صيغة نصية إلى كائنات Carbon التي تسمح بإجراء عمليات متقدمة على التواريخ
         $endOfDay = Carbon::parse('23:59:59');
         $lastBookingEndTime = Carbon::parse('00:00:00');
 

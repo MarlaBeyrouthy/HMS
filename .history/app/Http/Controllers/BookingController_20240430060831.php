@@ -90,7 +90,7 @@ class BookingController extends Controller
     }
 }
 
-//تابع للدفع المسبق 
+//
 public function handlePaymentSuccess(Request $request)
 {
     // البحث عن الحجز المرتبط بمعرف الجلسة
@@ -105,7 +105,6 @@ public function handlePaymentSuccess(Request $request)
     // حساب معدل الضريبة
     $taxRate = 0.1;
     $room = $booking->room;
-
     $room->status = 'booked'; // تحديث حالة الغرفة إلى "booked"
     $room->save();
     // حساب المبلغ المتبقي بعد دفع العربون
@@ -133,74 +132,70 @@ public function handlePaymentSuccess(Request $request)
         'invoice' => $invoice
     ]);
 }
-//تابع لاكمال عملية الدفع 
-public function completePayment(Request $request)
-{
-    // البحث عن الحجز المطلوب بناءً على معرف الحجز
-    $booking = Booking::where('id', $request->booking_id)->first();
-    if ($booking && $booking->payment_status == 'Pre_payment') 
-    {
-        // حساب المبلغ المتبقي بعد دفع العربون
-        $remainingAmount = $booking->room->roomClass->base_price - ($booking->room->roomClass->base_price * 0.25);
-        // تحديث حالة الدفع إلى "fully_paid"
-        $booking->payment_status = 'fully_paid';
-        $booking->save();
-        $invoice = $booking->invoice;
-        if ($invoice) 
-        {
-            // تحديث معلومات الفاتورة
-            $invoice->paid_amount = $invoice->total_amount;
-            $invoice->remaining_amount = 0;
-            $invoice->invoice_date = now();
-            $invoice->save();
-        } else 
-        {
-            // إنشاء فاتورة جديدة إذا لم تكن موجودة
-            $taxRate = 0.1;
-            $totalAmount = $booking->room->roomClass->base_price + ($booking->room->roomClass->base_price * $taxRate);
-            Invoice::create
-            ([
-                'booking_id' => $booking->id,
-                'total_amount' => $totalAmount,
-                'paid_amount' => $totalAmount,
-                'remaining_amount' => 0,
-                'taxes' => $totalAmount * $taxRate,
-                'invoice_date' => now(),
-            ]);
-        }
-        $username = $booking->user->first_name;
-        $roomNumber = $booking->room->room_number;
-        return $this->returnData('Payment completed successfully.', 
-        [
-            'username' => $username,
-            'room_number' => $roomNumber,
-            'invoice' => $invoice
-        ]);
-    } 
-    else 
-    {
-        return $this->returnErrorMessage('Booking not found or payment not completed.', 'error', 404);    
-    }
-}
 
-public function cancelBooking(Request $request)
-{
-    // البحث عن الحجز بناءً على معرف الحجز
-    $booking = Booking::find($request->booking_id);
-    if ($booking && $booking->payment_status == 'Pre_payment') 
+
+
+    public function completePayment(Request $request)
     {
-        // تحديث حالة الغرفة إلى "available"
-        $booking->room->status = 'available';
-        $booking->room->save();
-        // تحديث حالة الدفع إلى "cancel"
-        $booking->payment_status = 'cancel';
-        $booking->save();
-        // حذف الحجز (اختياري)
-        // $booking->delete();
-        return $this->returnSuccessMessage('Booking canceled successfully.');
-        } else 
+        $booking = Booking::where('id', $request->booking_id)->first();
+        if ($booking && $booking->payment_status == 'Pre_payment') 
         {
-            return $this->returnErrorMessage('Booking not found or already canceled.', 'error', 404);
+            $remainingAmount = $booking->room->roomClass->base_price - ($booking->room->roomClass->base_price * 0.25);
+            $booking->payment_status = 'fully_paid';
+            $booking->save();
+            $invoice = $booking->invoice;
+            if ($invoice) 
+            {
+                $invoice->paid_amount = $invoice->total_amount;
+                $invoice->remaining_amount = 0;
+                $invoice->invoice_date = now();
+                $invoice->save();
+            } else 
+            {
+                $taxRate = 0.1;
+                $totalAmount = $booking->room->roomClass->base_price + ($booking->room->roomClass->base_price * $taxRate);
+                Invoice::create
+                ([
+                    'booking_id' => $booking->id,
+                    'total_amount' => $totalAmount,
+                    'paid_amount' => $totalAmount,
+                    'remaining_amount' => 0,
+                    'taxes' => $totalAmount * $taxRate,
+                    'invoice_date' => now(),
+                ]);
+            }
+            $username = $booking->user->first_name;
+            $roomNumber = $booking->room->room_number;
+            return $this->returnData('Payment completed successfully.', 
+            [
+                'username' => $username,
+                'room_number' => $roomNumber,
+                'invoice' => $invoice
+            ]);
+        } 
+        else 
+        {
+            return $this->returnErrorMessage('Booking not found or payment not completed.', 'error', 404);    
         }
     }
+    
+    
+    
+    public function cancelBooking(Request $request)
+        {
+            $booking = Booking::find($request->booking_id);
+            if ($booking && $booking->payment_status == 'Pre_payment') 
+            {
+                $booking->room->status = 'available';
+                $booking->room->save();
+                $booking->payment_status = 'cancel';
+                $booking->save();
+                // $booking->delete();
+                return $this->returnSuccessMessage('Booking canceled successfully.');
+                } else 
+                {
+                    return $this->returnErrorMessage('Booking not found or already canceled.', 'error', 404);
+                }
+        }
+    
 }
