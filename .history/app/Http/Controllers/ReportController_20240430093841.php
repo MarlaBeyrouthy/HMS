@@ -2,16 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Traits\GeneralTrait;
 use App\Models\report;
 use Illuminate\Http\Request;
 
 class ReportController extends Controller
 {
-    use GeneralT
+    use GeneralTrait;
 
     public function create_report(Request $request)
     {
-        try {
+
             $valid_Titles = [ 'user', 'room', 'reservation', 'technical' ];
 
             // Validate the request data
@@ -29,11 +30,14 @@ class ReportController extends Controller
                 'message' => 'report created successfully',
                 'report'  => $report
             ], 201 );
-        }
+
+
+        /*
         catch (\Exception $e) {
             // Handle exceptions here
             return $this->returnError(['error' => 'An error occurred while adding room to wishlist.'], 500);
         }
+        */
     }
 
     public function my_reports()

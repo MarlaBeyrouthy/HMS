@@ -21,7 +21,7 @@ class UserSeeder extends Seeder
             'address' => 'damas',
             'phone' =>'09111111',
             'photo'=> 'uploads/users_photo/avatar.jpeg',
-            //'permission_id'=>1,
+            'permission_id'=>1,
             'personal_id'=>'122jch9'
         ],[
             'first_name' => 'marla',
@@ -31,9 +31,21 @@ class UserSeeder extends Seeder
             'address' => 'damas',
             'phone' =>'09111111',
             'photo'=> 'uploads/users_photo/avatar.jpeg',
-            //'permission_id'=>1,
+            'permission_id'=>1,
             'personal_id'=>'122jch9'
 
-        ]]);
+        ],
+            [
+                'first_name' => 'admin',
+                'last_name'=>'beyrouthy',
+                'email' =>'admin@gmail.com',
+                'password' => bcrypt('12341234'),
+                'address' => 'damas',
+                'phone' =>'09111111',
+                'photo'=> 'uploads/users_photo/avatar.jpeg',
+                'permission_id'=>2,
+                'personal_id'=>'122jch9'
+
+            ],]);
     }
 }
