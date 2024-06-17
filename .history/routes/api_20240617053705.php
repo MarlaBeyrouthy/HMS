@@ -64,6 +64,7 @@ Route::group(["middleware"=>["auth:api"]],function () {
     Route::post('/payment/cancel', [BookingController::class,'cancelBooking'])->name('booking.cancel');
     Route::post('/payment/complete', [BookingController::class,'completePayment'])->name('payment.complete');
     Route::post('/viewInvoice', [BookingController::class, 'viewInvoice']);
+<<<<<<< HEAD
     Route::post('/booking/update', [BookingController::class, 'updateBooking']);
     Route::get('/booking/{id}', [BookingController::class, 'showBookingDetails']);
     Route::get('/get/bookings', [BookingController::class, 'getUserBookings']);
@@ -71,6 +72,19 @@ Route::group(["middleware"=>["auth:api"]],function () {
     Route::post('/request/services', [ServiceController::class, 'requestService']);    
     Route::get('/bookings/{booking_id}/services', [ServiceController::class, 'showBookingServices']);
     Route::post('/services/cancel', [ServiceController::class, 'cancelServiceRequest']);
+=======
+    Route::post('/request/services', [ServiceController::class, 'requestService']);
+    Route::get('/index/services',[ServiceController::class, 'showServices']);
+
+
+    //Review
+    Route::post('rooms/{room}/reviews', [ReviewController::class,"setReview"]);
+
+    //reports api
+    Route::post('/make/reports', [ReportController::class, 'create_report']);
+    Route::get('/reports', [ReportController::class, 'my_reports']);
+
+>>>>>>> e64f01e70ad0db22fcb1dce0c886e7524338da98
 });
 //Services api
 Route::get('/index/services',[ServiceController::class, 'showServices']);
