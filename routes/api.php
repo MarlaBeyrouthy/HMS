@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ReviewController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RoomController;
@@ -9,7 +10,10 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\WishListController;
+use App\Http\Controllers\AdminController;
+
 use App\Http\Controllers\PasswordResetController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -34,6 +38,8 @@ Route::middleware('api')->group(function () {
 });
 
 Route::post("login",[UserController::class,"login"]);
+Route::post("dashboard/login",[AdminController::class,"login"]);
+
 
 //Password reset api
 Route::post('password/email', [PasswordResetController::class, 'sendResetCode']);
@@ -58,23 +64,68 @@ Route::group(["middleware"=>["auth:api"]],function () {
     Route::post('/payment/cancel', [BookingController::class,'cancelBooking'])->name('booking.cancel');
     Route::post('/payment/complete', [BookingController::class,'completePayment'])->name('payment.complete');
     Route::post('/viewInvoice', [BookingController::class, 'viewInvoice']);
-    Route::post('/booking/update', [BookingController::class, 'updateBooking']);
-    Route::get('/booking/{id}', [BookingController::class, 'showBookingDetails']);
-    Route::get('/get/bookings', [BookingController::class, 'getUserBookings']);
-    //service
-    Route::post('/request/services', [ServiceController::class, 'requestService']);    
-    Route::get('/bookings/{booking_id}/services', [ServiceController::class, 'showBookingServices']);
-    Route::post('/services/cancel', [ServiceController::class, 'cancelServiceRequest']);
+    Route::post('/request/services', [ServiceController::class, 'requestService']);
+    Route::get('/index/services',[ServiceController::class, 'showServices']);
 });
-//Services api
-Route::get('/index/services',[ServiceController::class, 'showServices']);
 
-//reports api
-Route::post('/reports', [ReportController::class, 'create_report']);
-Route::get('/reports', [ReportController::class, 'my_reports']);
+    //reports api
+    Route::post('/make/reports', [ReportController::class, 'create_report']);
+    Route::get('/reports', [ReportController::class, 'my_reports']);
+
+});
+
+//Review
+Route::get('show/{room}/reviews', [ReviewController::class,"showRoomReviews"]);
+
+
+
+
 
 //Room api
 Route::get('getAllRooms', [RoomController::class,"getAllRooms"])->name('get_all_rooms');
 Route::post('searchRooms', [RoomController::class, 'searchRooms']);
 Route::post('filterRooms', [RoomController::class, 'filterRooms']);
 Route::get('getRoomDetails/{room_id}', [RoomController::class,"getRoomDetails"]);
+
+
+//dashboard api
+Route::group(['prefix' => 'dashboard', 'middleware' => ['auth:api', 'Admin']], function () {
+    //admin profile
+    Route::post( "/profile", [ AdminController::class, "updateProfile" ] );
+    Route::get( "/myProfile", [ AdminController::class, "myProfile" ] );
+
+    // manage users
+    Route::post("/create/user",[AdminController::class,"createUser"]);
+    Route::get( "/getProfile/{id}", [ AdminController::class, "getProfile" ] );
+    Route::put('/users/{id}/ban', [AdminController::class, 'BanUser']);
+    Route::put('/users/{id}/unban', [AdminController::class, 'unBanUser']);
+    Route::get('/users/{userId}', [AdminController::class, 'showUser']);
+    Route::get('/users', [AdminController::class, 'indexUsers']);
+    Route::delete('/users/{id}', [AdminController::class, 'deleteUser']);
+    Route::get('/search', [AdminController::class, 'searchUsers']);
+
+    //reports
+    Route::get('/reports', [AdminController::class, 'showReports']);
+    Route::get('/users/{userId}/reports', [AdminController::class, 'getUserReports']);
+    Route::post('/reports/check', [AdminController::class, 'checkReports']);
+
+
+    //Room
+    Route::delete('/rooms/{id}', [AdminController::class, 'deleteRoom']);
+    Route::post('/create/rooms', [AdminController::class, 'createRoom']);
+
+    Route::post( "/update/room/{id}", [ AdminController::class, "updateRoom" ] );
+
+
+    Route::get('/dashboard/history/orders', [AdminController::class, 'getOrders']);
+    Route::get('/dashboard/products/search', [AdminController::class, 'searchProducts']);
+    Route::get('/dashboard/users/{userId}/orders', [AdminController::class, 'getUserOrders']);
+    Route::get('/dashboard/sellers', [AdminController::class, 'getSellers']);
+    Route::get('/dashboard/workers', [AdminController::class, 'getWorkers']);
+
+    Route::get('/dashboard/products/{productId}', [AdminController::class, 'showProduct']);
+    Route::get('/dashboard/products', [AdminController::class, 'indexProducts']);
+    Route::get('/dashboard/orders/{orderId}', [AdminController::class, 'showOrder']);
+    Route::get('/dashboard/orders', [AdminController::class, 'indexOrders']);
+    Route::post('/dashboard/products/filter', [AdminController::class, 'index_with_filter']);
+});

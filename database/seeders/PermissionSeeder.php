@@ -17,6 +17,8 @@ class PermissionSeeder extends Seeder
             ['permission' => 'user'],
             ['permission' => 'admin'],
             ['permission' => 'work'],
+            ['permission' => 'BanUser'],
+
         ]);
     }
 }

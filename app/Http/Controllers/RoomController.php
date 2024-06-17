@@ -6,7 +6,7 @@ use Carbon\Carbon;
 use App\Models\Room;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use App\Http\Traits\GeneralTrait; 
+use App\Http\Traits\GeneralTrait;
 
 class RoomController extends Controller
 {
@@ -16,6 +16,7 @@ class RoomController extends Controller
     {
         $query = Room::query();
         
+        // تطبيق شروط البحث
         $searchTerm = $request->input('search');
         if ($searchTerm) {
             $query->where(function ($query) use ($searchTerm) {
@@ -30,29 +31,15 @@ class RoomController extends Controller
                     });
             });
         }
-      
-        if ($request->has('floor')) {
-            $query->where('floor', $request->input('floor'));
-        }  if ($request->has('status')) {
-            $query->where('status', $request->input('status'));
-        }  if ($request->has('average_rating')) {
-            $query->where('average_rating', $request->input('average_rating'));
-        }  
         
-        if ($request->has('class_name')) {
-            $className = $request->input('class_name');
-            $query->whereHas('roomClass', function ($query) use ($className) {
-                $query->where('class_name', 'LIKE', "%$className%");
-            });
-        }
         if ($request->has('view')) {
             $query->where('view', $request->input('view'));
         }
-    
+
         if ($request->has('base_price')) {
             $priceComparison = $request->input('price_comparison', 'less_than');
             $basePrice = $request->input('base_price');
-    
+
             if ($priceComparison === 'less_than') {
                 $query->whereHas('roomClass', function ($query) use ($basePrice) {
                     $query->where('base_price', '<=', $basePrice);
@@ -64,29 +51,31 @@ class RoomController extends Controller
             }
         }
     
+        // استخدام eager loading لتحسين الأداء، مع تحديد الحقول المطلوبة فقط من bookings
         $rooms = $query->with(['roomClass', 'reviews', 'bookings' => function ($query) {
             $query->select('room_id', 'check_in_date', 'check_out_date');
         }])->get();
     
+        // التحقق مما إذا كانت الغرف فارغة
         if ($rooms->isEmpty()) {
             return $this->returnErrorMessage('No rooms found.', 'E001');
         }
-    
+
         return $this->returnData('Rooms retrieved successfully', $rooms);
     }
-    
-    
 
 
 
-   
+
+
+
 
 
 
     public function getAllRooms()
     {
         $rooms = Room::where('status', '!=', 'maintenance')->get();
-        
+
         foreach ($rooms as $room) {
             // جلب الحجوزات الحالية
             $currentBookings = $room->bookings()->where('check_out_date', '>', now())->get();
@@ -124,8 +113,8 @@ class RoomController extends Controller
         }
         return $this->returnData('All rooms retrieved successfully', $rooms);
     }
-    
-    
+
+
     public function getRoomDetails($id)
     {
     $room = Room::with(['roomClass', 'reviews'])->find($id);
