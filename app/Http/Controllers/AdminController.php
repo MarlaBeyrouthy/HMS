@@ -363,6 +363,5 @@ class AdminController extends Controller
         return $this->returnData('Users data.', $users, 200);
     }
 }
-//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
 
 
