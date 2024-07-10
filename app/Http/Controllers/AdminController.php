@@ -215,8 +215,8 @@ class AdminController extends Controller
             // Calculate the number of days
             $checkInDate  = new \DateTime( $booking->check_in_date );
             $checkOutDate = new \DateTime( $booking->check_out_date );
-            $interval     = $checkInDate->diff( $checkOutDate );
-            $numDays      = $interval->days;
+            $interval     = $checkInDate->diff( $checkOutDate )  ;
+            $numDays = $interval->days + 1; // Add one day to include the check-out day
 
             // Get additional data for the invoice
             $invoice   = $booking->invoices;
@@ -232,6 +232,8 @@ class AdminController extends Controller
                 'room'      => $room,
                 'roomClass' => $roomClass,
                 'numDays'   => $numDays,
+                'checkInDate' => $booking->check_in_date,
+                'checkOutDate' => $booking->check_out_date,
             ];
 
             // Create a PDF and load the view

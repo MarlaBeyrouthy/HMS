@@ -50,6 +50,17 @@
                 <th>Number of Days:</th>
                 <td>{{ $numDays }}</td>
             </tr>
+
+\
+            <tr>
+                <th>Check-in Date:</th>
+                <td>{{ $checkInDate }}</td>
+            </tr>
+            <tr>
+                <th>Check-out Date:</th>
+                <td>{{ $checkOutDate }}</td>
+            </tr>
+
             <tr>
                 <th>Total Amount:</th>
                 <td>{{ $invoice->total_amount }}</td>
