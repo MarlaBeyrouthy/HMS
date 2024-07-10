@@ -68,9 +68,11 @@ Route::group(["middleware"=>["auth:api"]],function () {
     Route::get('/booking/{id}', [BookingController::class, 'showBookingDetails']);
     Route::get('/get/bookings', [BookingController::class, 'getUserBookings']);
     //service
-    Route::post('/request/services', [ServiceController::class, 'requestService']);    
+    Route::post('/request/services', [ServiceController::class, 'requestService']);
     Route::get('/bookings/{booking_id}/services', [ServiceController::class, 'showBookingServices']);
     Route::post('/services/cancel', [ServiceController::class, 'cancelServiceRequest']);
+
+
 });
 //Services api
 Route::get('/index/services',[ServiceController::class, 'showServices']);
@@ -90,6 +92,7 @@ Route::post('searchRooms', [RoomController::class, 'searchRooms']);
 Route::post('filterRooms', [RoomController::class, 'filterRooms']);
 Route::get('getRoomDetails/{room_id}', [RoomController::class,"getRoomDetails"]);
 
+//Route::get('/invoices/download/{id}', [AdminController::class, 'downloadInvoice'])->name('invoices.download');
 
 
 
@@ -114,14 +117,20 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth:api', 'Admin']], f
     Route::get('/users/{userId}/reports', [AdminController::class, 'getUserReports']);
     Route::post('/reports/check', [AdminController::class, 'checkReports']);
 
+
+    //invoice
+    Route::get('/invoices/download/{id}', [AdminController::class, 'downloadInvoice'])->name('invoices.download');
+
+
     //Room
     Route::delete('/rooms/{id}', [AdminController::class, 'deleteRoom']);
     Route::post('/create/rooms', [AdminController::class, 'createRoom']);
     Route::post( "/update/room/{id}", [ AdminController::class, "updateRoom" ] );
+
     //Booking
     Route::get('/bookings', [AdminBookingController::class, 'index']);
     Route::post('/search/bookings', [AdminBookingController::class, 'searchBookings']);
-    Route::get('/destroy/bookings/{id}', [AdminBookingController::class, 'destroy']);  
+    Route::get('/destroy/bookings/{id}', [AdminBookingController::class, 'destroy']);
     Route::get('/show/booking/Details/{id}', [AdminBookingController::class, 'showDetails']);
     Route::put('/bookings/{id}/payment-status', [AdminBookingController::class, 'updatePaymentStatus']);
     Route::post('/create/bookings', [AdminBookingController::class, 'createBooking']);
