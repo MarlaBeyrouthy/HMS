@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Invoice</title>
+    <title>JAVAR Hotel Invoice</title>
     <style>
         /* Add your custom styles here */
         body {
@@ -29,7 +29,7 @@
 <body>
 <div class="invoice">
     <div class="invoice-header">
-        <h1>Invoice</h1>
+        <h1>JAVAR HOTEL INVOICE</h1>
         <p>Date: {{ $invoice->invoice_date }}</p>
     </div>
     <div class="invoice-details">
