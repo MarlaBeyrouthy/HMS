@@ -67,6 +67,10 @@ Route::group(["middleware"=>["auth:api"]],function () {
     Route::post('/booking/update', [BookingController::class, 'updateBooking']);
     Route::get('/booking/{id}', [BookingController::class, 'showBookingDetails']);
     Route::get('/get/bookings', [BookingController::class, 'getUserBookings']);
+
+
+    Route::get('/invoices/download/{id}', [BookingController::class, 'downloadInvoice'])->name('invoices.download');
+
     //service
     Route::post('/request/services', [ServiceController::class, 'requestService']);
     Route::get('/bookings/{booking_id}/services', [ServiceController::class, 'showBookingServices']);

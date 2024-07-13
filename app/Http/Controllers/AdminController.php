@@ -216,15 +216,13 @@ class AdminController extends Controller
             $checkInDate  = new \DateTime( $booking->check_in_date );
             $checkOutDate = new \DateTime( $booking->check_out_date );
             $interval     = $checkInDate->diff( $checkOutDate )  ;
-            $numDays = $interval->days + 1; // Add one day to include the check-out day
+            $numDays = $interval->days + 1;
 
-            // Get additional data for the invoice
             $invoice   = $booking->invoices;
             $user      = $booking->user;
             $room      = $booking->room;
             $roomClass = $room->roomClass;
 
-            // Pass data to the view
             $data = [
                 'booking'   => $booking,
                 'invoice'   => $invoice,

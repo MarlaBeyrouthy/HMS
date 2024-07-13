@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Room;
 use App\Models\Booking;
 use GuzzleHttp\ClientTrait;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use App\Services\BookingService;
 use App\Http\Traits\GeneralTrait;
@@ -12,7 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class BookingController extends Controller
-{ 
+{
     use GeneralTrait;
     protected $bookingService;
 
@@ -245,7 +246,7 @@ public function showBookingDetails($id)
 {
     $booking = Booking::with('room', 'user', 'invoices')->find($id);
 
-    
+
     if (!$booking) {
         return $this->returnErrorMessage('Booking not found.', 'E006', 404);
     }
@@ -264,5 +265,56 @@ public function showBookingDetails($id)
         'invoice' => $booking->invoices,
     ], 200);
 }
+
+    public function downloadInvoice($id) {
+        try {
+            // Fetch the booking and related invoice
+            $booking = Booking::with( [ 'user', 'room.roomClass', 'invoices' ] )->findOrFail( $id );
+
+
+            if ($booking->user_id !== Auth::id()) {
+                return $this->returnErrorMessage('Unauthorized access.', 'E008', 403);
+            }
+
+            // Calculate the number of days
+            $checkInDate  = new \DateTime( $booking->check_in_date );
+            $checkOutDate = new \DateTime( $booking->check_out_date );
+            $interval     = $checkInDate->diff( $checkOutDate )  ;
+            $numDays = $interval->days + 1;
+
+            $invoice   = $booking->invoices;
+            $user      = $booking->user;
+            $room      = $booking->room;
+            $roomClass = $room->roomClass;
+
+            $data = [
+                'booking'   => $booking,
+                'invoice'   => $invoice,
+                'user'      => $user,
+                'room'      => $room,
+                'roomClass' => $roomClass,
+                'numDays'   => $numDays,
+                'checkInDate' => $booking->check_in_date,
+                'checkOutDate' => $booking->check_out_date,
+            ];
+
+            // Create a PDF and load the view
+            $pdf = app( 'dompdf.wrapper' );
+            $pdf->loadView( 'pdf', $data );
+
+            // Download the generated PDF
+            return $pdf->download( 'invoice.pdf' );
+        } catch ( ModelNotFoundException $e ) {
+            return response()->json( [
+                'message' => 'Booking not found',
+            ], 404 );
+        } catch ( \Exception $e ) {
+            return response()->json( [
+                'message' => 'An error occurred while generating the invoice',
+                'error'   => $e->getMessage(),
+            ], 500 );
+        }
+    }
+
 
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\AccountConfirmationMail;
 use App\Models\User;
 use App\Services\UserService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
