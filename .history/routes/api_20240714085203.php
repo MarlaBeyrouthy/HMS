@@ -69,7 +69,7 @@ Route::group(["middleware"=>["auth:api"]],function () {
     Route::get('/get/bookings', [BookingController::class, 'getUserBookings']);
 
 
-    Route::get('/invoices/download/{id}', [BookingController::class, 'downloadInvoice'])->name('user-invoices.download');
+    Route::get('/invoices/download/{id}', [BookingController::class, 'downloadInvoice'])->name('invoices.download');
 
     //service
     Route::post('/request/services', [ServiceController::class, 'requestService']);

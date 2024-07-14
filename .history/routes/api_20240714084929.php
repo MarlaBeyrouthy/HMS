@@ -69,7 +69,7 @@ Route::group(["middleware"=>["auth:api"]],function () {
     Route::get('/get/bookings', [BookingController::class, 'getUserBookings']);
 
 
-    Route::get('/invoices/download/{id}', [BookingController::class, 'downloadInvoice'])->name('user-invoices.download');
+    Route::get('/user-invoices/download/{id}', [BookingController::class, 'downloadInvoice']);
 
     //service
     Route::post('/request/services', [ServiceController::class, 'requestService']);
@@ -123,7 +123,7 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth:api', 'Admin']], f
 
 
     //invoice
-    Route::get('/invoices/download/{id}', [AdminController::class, 'downloadInvoice'])->name('invoices.download');
+    Route::get('/admin-invoices/download/{id}', [AdminController::class, 'downloadInvoice']);
 
 
     //Room

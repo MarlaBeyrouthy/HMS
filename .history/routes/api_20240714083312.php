@@ -60,7 +60,7 @@ Route::group(["middleware"=>["auth:api"]],function () {
     Route::get('wishlist/ID', [WishlistController::class,'getIDs']);
 
     //Booking api
-    Route::post('/booking', [BookingController::class,'makeBooking'])->name('booking.success');
+    Route::post('/booking', [BookingController::class,'makeBooking'])->name('api.booking.make');
     Route::post('/payment/cancel', [BookingController::class,'cancelBooking'])->name('booking.cancel');
     Route::post('/payment/complete', [BookingController::class,'completePayment'])->name('payment.complete');
     Route::post('/viewInvoice', [BookingController::class, 'viewInvoice']);
@@ -69,7 +69,7 @@ Route::group(["middleware"=>["auth:api"]],function () {
     Route::get('/get/bookings', [BookingController::class, 'getUserBookings']);
 
 
-    Route::get('/invoices/download/{id}', [BookingController::class, 'downloadInvoice'])->name('user-invoices.download');
+    Route::get('/user-invoices/download/{id}', [BookingController::class, 'downloadInvoice'])->name('invoices.download');
 
     //service
     Route::post('/request/services', [ServiceController::class, 'requestService']);
