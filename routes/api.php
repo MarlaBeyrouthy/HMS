@@ -27,7 +27,10 @@ use App\Http\Controllers\PasswordResetController;
 |
 */
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 20cdfdd24b2a61e5d8e6d2f3de6a947af2dd92dc
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
