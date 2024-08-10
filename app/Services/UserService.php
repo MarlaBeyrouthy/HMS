@@ -18,9 +18,6 @@ use Symfony\Component\Mailer\Exception\TransportException;
 
 class UserService {
 
-
-
-
     public function sendVerificationCode(Request $request)
     {
         $this->validateEmail($request);
@@ -126,8 +123,6 @@ class UserService {
         ]);
     }
 
-
-
     public function login(array $userData)
     {
 
@@ -137,21 +132,25 @@ class UserService {
             "password" => "required",
         ]);
 
+
         if ($validator->fails()) {
             throw new \Exception($validator->errors()->first());
         }
+
 
             if (!auth()->attempt($userData)){
                 throw ValidationException::withMessages([
                     'email' => ['Invalid credentials'],
                 ]);
             }
+
+
+
             $token = auth()->user()->createToken("auth_token")->accessToken;
 
             return $token;
 
     }
-
 
     public function getProfile($userId)
     {

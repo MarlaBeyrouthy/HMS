@@ -84,7 +84,7 @@ class BookingService
     public function createBooking($request, $paymentMethod, $paymentStatus, $sessionId = null)
     {
         return Booking::create([
-            'user_id' =>ِAuth::,
+            'user_id' =>ِAuth::id(),
             'room_id' => $request->room_id,
             'check_in_date' => $request->check_in_date,
             'check_out_date' => $request->check_out_date,
@@ -266,10 +266,10 @@ class BookingService
         $originalCheckInDate = new \DateTime($booking->check_in_date);
         $originalCheckOutDate = new \DateTime($booking->check_out_date);
         $originalNumberOfNights = $originalCheckInDate->diff($originalCheckOutDate)->days;
-        
+
         $originalRoom = Room::findOrFail($booking->room_id);
         $originalBasePricePerNight = $originalRoom->roomClass->base_price;
-        
+
         // تحديث بيانات الحجز
         $booking->room_id = $data['room_id'];
         $booking->check_in_date = $data['check_in_date'];
@@ -277,29 +277,29 @@ class BookingService
         $booking->num_adults = $data['num_adults'];
         $booking->num_children = $data['num_children'];
         $booking->save();
-        
+
         // حساب البيانات المحدثة
         $checkInDate = new \DateTime($booking->check_in_date);
         $checkOutDate = new \DateTime($booking->check_out_date);
         $numberOfNights = $checkInDate->diff($checkOutDate)->days;
-        
+
         $taxRate = 0.1;
-        
+
         $room = Room::findOrFail($data['room_id']);
         $roomClass = $room->roomClass;
         $basePricePerNight = $roomClass->base_price;
-        
+
         // حساب المبلغ المدفوع
         $paidAmount = $booking->invoices->paid_amount;
-        
+
         // حساب الخدمات المطلوبة
         $services = $booking->services;
         $servicesTotal = $services->sum('price');
-        
+
         // حساب المبلغ الإجمالي
         $totalAmount = ($basePricePerNight * $numberOfNights) + $servicesTotal;
         $remainingAmount = $totalAmount - $paidAmount;
-        
+
         // تحديث الفاتورة
         $invoice = $booking->invoices;
         $lastRemainingAmount = $invoice->remaining_amount;
@@ -307,19 +307,19 @@ class BookingService
         $invoice->remaining_amount = $remainingAmount;
         $invoice->taxes = $totalAmount * $taxRate;
         $invoice->save();
-        
+
         $invoiceData = $invoice->only(['total_amount', 'paid_amount', 'remaining_amount']);
-        
+
         // التحقق إذا كان هناك زيادة في سعر الغرفة أو عدد الليالي
         $isRoomPriceIncreased = $basePricePerNight > $originalBasePricePerNight;
         $isNumberOfNightsIncreased = $numberOfNights > $originalNumberOfNights;
-        
+
         // تحديث حالة الدفع إلى 'pre_payment' إذا كانت التغييرات تتطلب دفع إضافي
         if (($isRoomPriceIncreased || $isNumberOfNightsIncreased) && $lastRemainingAmount == 0 && $remainingAmount > 0) {
             $booking->payment_status = 'pre_payment';
             $booking->save();
         }
-        
+
         // تحديد رسالة الرد بناءً على المبلغ المتبقي
         if ($remainingAmount > $lastRemainingAmount) {
             return [

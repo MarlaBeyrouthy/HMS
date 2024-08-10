@@ -123,7 +123,7 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth:api', 'Admin']], f
 
 
     //invoice
-    Route::get('/invoices/download/{id}', [AdminController::class, 'downloadInvoice'])->name('invoices.download');
+    Route::get('/invoices/download/{id}', [AdminController::class, 'downloadInvoice'])->name('web.invoices.download');
 
 
     //Room

@@ -45,7 +45,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password' => 'hashed',
+       // 'password' => 'hashed',
     ];
 
     public function bookings()
@@ -69,3 +69,4 @@ class User extends Authenticatable
         return $this->belongsTo(Permission::class);
     }
 }
+// "laravel/framework": "^10.10",
