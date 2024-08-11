@@ -3,6 +3,7 @@
 namespace App\Events;
 
 use App\Models\Booking;
+use App\Notifications\CheckoutReminderNotification;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -11,6 +12,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Notification;
 
 class BookingCheckoutReminder implements ShouldBroadcastNow
 {
@@ -24,6 +26,8 @@ class BookingCheckoutReminder implements ShouldBroadcastNow
     public function __construct(Booking $booking)
     {
         $this->booking = $booking;
+        Notification::send($booking->user, new CheckoutReminderNotification($booking));
+
     }
 
     /**
