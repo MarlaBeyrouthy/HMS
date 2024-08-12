@@ -21,8 +21,8 @@ class EventServiceProvider extends ServiceProvider
             SendEmailVerificationNotification::class,
         ],
 
-        BookingCheckoutReminder::class => [
-            CheckoutReminderNotification::class,
+        \App\Events\BookingCheckoutReminder::class => [
+            \App\Listeners\SendBookingCheckoutReminderNotification::class,
         ],
 
     ];

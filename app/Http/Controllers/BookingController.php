@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\BookingCheckoutReminder;
 use App\Models\Room;
 use App\Models\Booking;
+use App\Notifications\CheckoutReminderNotification;
 use Carbon\Carbon;
 use GuzzleHttp\ClientTrait;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -12,6 +13,7 @@ use Illuminate\Http\Request;
 use App\Services\BookingService;
 use App\Http\Traits\GeneralTrait;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
 
 class BookingController extends Controller
@@ -79,6 +81,7 @@ class BookingController extends Controller
 
             foreach ($bookings as $booking) {
                 event(new BookingCheckoutReminder($booking));
+
             }
 
             return $this->returnData('Booking created successfully.', [
