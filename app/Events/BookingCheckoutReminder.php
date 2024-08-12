@@ -38,5 +38,17 @@ class BookingCheckoutReminder implements ShouldBroadcastNow
     public function broadcastOn()
     {
         return new PrivateChannel('booking.'.$this->booking->user_id);
+       // return new Channel('booking');
+
     }
+
+    public function broadcastWith()
+    {
+        return [
+            'booking_id' => $this->booking->id,
+            'checkout_date' => $this->booking->check_out_date,
+            'message' => 'Reminder: Please complete your payment before the checkout date.',
+        ];
+    }
+
 }

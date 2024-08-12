@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\BookingCheckoutReminder;
 use App\Models\Room;
 use App\Models\Booking;
+use Carbon\Carbon;
 use GuzzleHttp\ClientTrait;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
@@ -70,6 +72,14 @@ class BookingController extends Controller
             $room->save();
 
             $invoiceData = $this->bookingService->createInvoice($booking, $room);
+
+            $bookings = Booking::where('check_out_date', Carbon::now()->format('Y-m-d'))
+                               ->where('payment_status', 'Pre_payment')
+                               ->get();
+
+            foreach ($bookings as $booking) {
+                event(new BookingCheckoutReminder($booking));
+            }
 
             return $this->returnData('Booking created successfully.', [
                 'payment_method' => 'cash',

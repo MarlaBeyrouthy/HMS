@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\BroadcastController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RoomController;
@@ -76,7 +78,12 @@ Route::group(["middleware"=>["auth:api"]],function () {
     Route::get('/bookings/{booking_id}/services', [ServiceController::class, 'showBookingServices']);
     Route::post('/services/cancel', [ServiceController::class, 'cancelServiceRequest']);
 
+    Route::post('/broadcasting/auth', [BroadcastController::class, 'authenticate']);
 
+
+    //notification
+    Route::get('/notifications', [NotificationController::class,'index']);
+    Route::post('/notifications/{id}/mark-as-read', [NotificationController::class,'markAsRead']);
 });
 //Services api
 Route::get('/index/services',[ServiceController::class, 'showServices']);

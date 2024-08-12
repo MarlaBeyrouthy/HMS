@@ -32,7 +32,7 @@ class CheckoutReminderNotification extends Notification implements ShouldBroadca
      */
     public function via(object $notifiable): array
     {
-        return ['broadcast', 'database'];
+        return [ 'database' ,'broadcast'];
     }
 
     /**
@@ -48,18 +48,6 @@ class CheckoutReminderNotification extends Notification implements ShouldBroadca
     }
 */
     /**
-     * Get the array representation of the notification.
-     *
-     * @return BroadcastMessage
-     */
-    public function toBroadcast($notifiable): BroadcastMessage {
-        return new BroadcastMessage([
-            'booking_id' => $this->booking->id,
-            'checkout_date' => $this->booking->check_out_date,
-            'message' => 'Reminder: Please complete your payment before the checkout date.',
-        ]);
-    }
-    /**
      * Get the array representation of the notification for storage in the database.
      *
      * @return array
@@ -71,6 +59,19 @@ class CheckoutReminderNotification extends Notification implements ShouldBroadca
             'message' => 'Reminder: Please complete your payment before the checkout date.',
         ];
     }
+    /**
+     * Get the array representation of the notification.
+     *
+     * @return BroadcastMessage
+     */
+    public function toBroadcast($notifiable): BroadcastMessage {
+        return new BroadcastMessage([
+            'booking_id' => $this->booking->id,
+            'checkout_date' => $this->booking->check_out_date,
+            'message' => 'Reminder: Please complete your payment before the checkout date.',
+        ]);
+    }
+
     /**
      * Get the array representation of the notification.
      *
