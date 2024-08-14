@@ -1,8 +1,9 @@
 <?php
 
+use App\Http\Controllers\BroadcastController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ManageServices;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
@@ -12,10 +13,8 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\WishListController;
-use App\Http\Controllers\BroadcastController;
 
 use App\Http\Controllers\AdminBookingController;
-use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PasswordResetController;
 
 
@@ -149,6 +148,5 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth:api', 'Admin']], f
     Route::post('/create/bookings', [AdminBookingController::class, 'createBooking']);
     Route::post('/create/forCustomer', [AdminBookingController::class, 'createBookingForCustomer']);
     //Manage Service
-    Route::apiResource('services', ManageServices::class);
 });
 

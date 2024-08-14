@@ -125,4 +125,8 @@ public function assignServiceToBooking($serviceId, $bookingId)
  
          return $this->returnData('Booking services retrieved successfully', $services);
      }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 1bf90e6 (Notification and Manage Service)
